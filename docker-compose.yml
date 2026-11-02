@@ -1,0 +1,33 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: foodassistant
+      POSTGRES_USER: ${DB_USER:-foodassistant}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no arquivo .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-foodassistant} -d foodassistant"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Adicionar quando o backend tiver Dockerfile:
+  # api:
+  #   build: ./backend
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     DB_URL: jdbc:postgresql://db:5432/foodassistant
+  #     DB_USER: ${DB_USER:-foodassistant}
+  #     DB_PASSWORD: ${DB_PASSWORD}
+  #     AWS_REGION: ${AWS_REGION}
+  #     BEDROCK_LLM_MODEL_ID: ${BEDROCK_LLM_MODEL_ID}
+  #     BEDROCK_EMBEDDING_MODEL_ID: ${BEDROCK_EMBEDDING_MODEL_ID}
+
+volumes:
+  db_data:

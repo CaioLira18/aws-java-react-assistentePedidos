@@ -1,0 +1,18 @@
+[
+  {
+    "id": "001",
+    "prompt": "quero um almoço vegetariano até R$ 40",
+    "expect": { "required_tags": ["vegetariano"], "max_price_cents": 4000 }
+  },
+  {
+    "id": "002",
+    "prompt": "algo sem glúten que fique pronto em até 30 minutos",
+    "expect": { "required_tags": ["sem-gluten"], "max_prep_minutes": 30 }
+  },
+  {
+    "id": "003",
+    "prompt": "adiciona dois do primeiro prato ao carrinho",
+    "context": "depois de uma busca que retornou resultados",
+    "expect": { "tool_called": "add_to_cart", "quantity": 2 }
+  }
+]
