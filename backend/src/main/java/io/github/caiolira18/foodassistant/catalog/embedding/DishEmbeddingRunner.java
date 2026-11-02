@@ -41,7 +41,7 @@ class DishEmbeddingRunner implements CommandLineRunner {
         int done = 0;
         for (DishRow dish : dishes) {
             float[] vector = embeddings.embed(textFor(dish.name(), dish.description(), dish.tags()));
-            jdbc.update("UPDATE dish SET embedding = ?::vector WHERE id = ?", toVectorLiteral(vector), dish.id());
+            jdbc.update("UPDATE dish SET embedding = ?::vector WHERE id = ?", VectorLiteral.of(vector), dish.id());
             if (++done % 25 == 0) {
                 log.info("{}/{} embeddings gerados", done, dishes.size());
             }
@@ -55,16 +55,5 @@ class DishEmbeddingRunner implements CommandLineRunner {
             text += " Restrições: " + String.join(", ", tags).replace('-', ' ') + ".";
         }
         return text;
-    }
-
-    static String toVectorLiteral(float[] vector) {
-        StringBuilder sb = new StringBuilder("[");
-        for (int i = 0; i < vector.length; i++) {
-            if (i > 0) {
-                sb.append(',');
-            }
-            sb.append(vector[i]);
-        }
-        return sb.append(']').toString();
     }
 }
