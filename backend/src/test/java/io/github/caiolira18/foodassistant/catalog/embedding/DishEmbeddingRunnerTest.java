@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+   
 
 class DishEmbeddingRunnerTest {
 
@@ -22,7 +23,7 @@ class DishEmbeddingRunnerTest {
 
     @Test
     void vectorLiteralUsesPgvectorFormat() {
-        assertEquals("[0.5,-1.0]", DishEmbeddingRunner.toVectorLiteral(new float[] {0.5f, -1.0f}));
+        assertEquals("[0.5,-1.0]", VectorLiteral.of(new float[] {0.5f, -1.0f}));
     }
 
     @Test
