@@ -93,7 +93,7 @@ Esta lista é um plano e pode mudar ao longo do projeto.
 
 **Semana 1: base e busca**
 
-- `chore/backend-bootstrap`: projeto Spring Initializr, configuração, Actuator
+- `chore/backend-bootstrap`: projeto Spring Initializr, configuração, Actuator (FEITO)
 - `feat/db-schema`: migração Flyway e conexão com o banco
 - `feat/catalog-seed-generator`: gerador do catálogo fictício
 - `feat/embedding-client`: geração de embeddings pelo Bedrock
