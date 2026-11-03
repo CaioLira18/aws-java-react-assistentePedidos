@@ -94,10 +94,10 @@ Esta lista é um plano e pode mudar ao longo do projeto.
 **Semana 1: base e busca**
 
 - `chore/backend-bootstrap`: projeto Spring Initializr, configuração, Actuator (FEITO)
-- `feat/db-schema`: migração Flyway e conexão com o banco
-- `feat/catalog-seed-generator`: gerador do catálogo fictício
-- `feat/embedding-client`: geração de embeddings pelo Bedrock
-- `feat/catalog-hybrid-search`: filtros SQL + pgvector, com testes de integração
+- `feat/db-schema`: migração Flyway e conexão com o banco (FEITO)
+- `feat/catalog-seed-generator`: gerador do catálogo fictício (FEITO)
+- `feat/embedding-client`: geração de embeddings pelo Bedrock (FEITO)
+- `feat/catalog-hybrid-search`: filtros SQL + pgvector, com testes de integração (FEITO)
 - `ci/backend-pipeline`: build e testes no GitHub Actions
 
 **Semana 2: agente e chat**
