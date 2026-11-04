@@ -98,7 +98,7 @@ Esta lista é um plano e pode mudar ao longo do projeto.
 - `feat/catalog-seed-generator`: gerador do catálogo fictício (FEITO)
 - `feat/embedding-client`: geração de embeddings pelo Bedrock (FEITO)
 - `feat/catalog-hybrid-search`: filtros SQL + pgvector, com testes de integração (FEITO)
-- `ci/backend-pipeline`: build e testes no GitHub Actions
+- `ci/backend-pipeline`: build e testes no GitHub Actions (FEITO)
 
 **Semana 2: agente e chat**
 
