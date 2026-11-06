@@ -1,7 +1,6 @@
 package io.github.caiolira18.foodassistant.catalog.search;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.sql.PreparedStatement;
@@ -52,9 +51,10 @@ class DishSearchRepositoryTest {
         jdbc = new JdbcTemplate(dataSource);
         repository = new DishSearchRepository(jdbc);
 
-        insert("Feijoada Vegana", 3190, 45, new String[] {"vegano", "vegetariano", "sem-lactose", "sem-gluten"}, vec(1, 0, 0), true);
+        insert("Feijoada Vegana", 3190, 45, new String[] { "vegano", "vegetariano", "sem-lactose", "sem-gluten" },
+                vec(1, 0, 0), true);
         insert("Feijoada Completa", 3990, 50, new String[] {}, vec(0.9f, 0.1f, 0), true);
-        insert("Tapioca de Queijo", 1890, 10, new String[] {"vegetariano", "sem-gluten"}, vec(0.5f, 0.5f, 0), true);
+        insert("Tapioca de Queijo", 1890, 10, new String[] { "vegetariano", "sem-gluten" }, vec(0.5f, 0.5f, 0), true);
         insert("Salada Caesar", 2690, 15, new String[] {}, vec(0, 1, 0), true);
         insert("Prato Inativo", 1000, 10, new String[] {}, vec(1, 0, 0), false);
         insert("Prato Sem Embedding", 1000, 10, new String[] {}, null, true);
@@ -134,5 +134,24 @@ class DishSearchRepositoryTest {
             ps.setBoolean(7, active);
             return ps;
         });
+    }
+
+    @Test
+    void findsAnActiveDishById() {
+        DishDetails dish = repository.findActiveById(idOf("Feijoada Vegana")).orElseThrow();
+
+        assertEquals("Feijoada Vegana", dish.name());
+        assertEquals(3190, dish.priceCents());
+        assertTrue(dish.dietaryTags().contains("vegano"));
+    }
+
+    @Test
+    void doesNotFindInactiveOrMissingDishes() {
+        assertTrue(repository.findActiveById(idOf("Prato Inativo")).isEmpty());
+        assertTrue(repository.findActiveById(-1).isEmpty());
+    }
+
+    private static long idOf(String name) {
+        return jdbc.queryForObject("SELECT id FROM dish WHERE name = ?", Long.class, name);
     }
 }

@@ -3,6 +3,7 @@ package io.github.caiolira18.foodassistant.catalog.search;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -64,5 +65,20 @@ class DishSearchRepository {
                 rs.getInt("prep_minutes"),
                 Arrays.asList((String[]) rs.getArray("dietary_tags").getArray()),
                 rs.getDouble("similarity")));
+    }
+
+    Optional<DishDetails> findActiveById(long id) {
+        List<DishDetails> found = jdbc.query("""
+                SELECT id, name, description, price_cents, prep_minutes, dietary_tags
+                FROM dish
+                WHERE id = ? AND active
+                """, (rs, rowNum) -> new DishDetails(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getInt("price_cents"),
+                rs.getInt("prep_minutes"),
+                Arrays.asList((String[]) rs.getArray("dietary_tags").getArray())), id);
+        return found.stream().findFirst();
     }
 }

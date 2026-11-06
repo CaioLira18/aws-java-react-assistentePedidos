@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,8 @@ class DishSearchServiceTest {
     @Test
     void rejectsInvalidLimit() {
         assertThrows(IllegalArgumentException.class, () -> service.search("vegano", null, 0));
-        assertThrows(IllegalArgumentException.class, () -> service.search("vegano", null, DishSearchService.MAX_LIMIT + 1));
+        assertThrows(IllegalArgumentException.class,
+                () -> service.search("vegano", null, DishSearchService.MAX_LIMIT + 1));
         verifyNoInteractions(repository);
     }
 
@@ -47,5 +49,14 @@ class DishSearchServiceTest {
 
         assertEquals(expected, service.search("feijoada vegana", null, 5));
         verify(repository).search(any(float[].class), eq(DishSearchFilters.none()), eq(5));
+    }
+
+    @Test
+    void getDishDelegatesToTheRepositoryAndIgnoresInvalidIds() {
+        var dish = new DishDetails(7, "Feijoada Vegana", "desc", 3190, 45, List.of("vegano"));
+        when(repository.findActiveById(7)).thenReturn(Optional.of(dish));
+
+        assertEquals(Optional.of(dish), service.getDish(7));
+        assertEquals(Optional.empty(), service.getDish(0));
     }
 }

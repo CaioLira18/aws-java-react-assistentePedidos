@@ -1,6 +1,7 @@
 package io.github.caiolira18.foodassistant.catalog.search;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,12 @@ public class DishSearchService {
         }
         DishSearchFilters effective = filters == null ? DishSearchFilters.none() : filters;
         return repository.search(embeddings.embed(query.strip()), effective, limit);
+    }
+
+    public Optional<DishDetails> getDish(long id) {
+        if (id < 1) {
+            return Optional.empty();
+        }
+        return repository.findActiveById(id);
     }
 }
