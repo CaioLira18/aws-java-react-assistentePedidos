@@ -102,10 +102,10 @@ Esta lista é um plano e pode mudar ao longo do projeto.
 
 **Semana 2: agente e chat**
 
-- `feat/llm-client-port`: porta `LlmClient`, `FakeLlmClient` e adaptador Bedrock
-- `feat/agent-orchestrator`: loop do agente com limite de iterações
-- `feat/agent-search-tools`: tools `search_dishes` e `get_dish`
-- `feat/cart-api`: módulo `ordering` e carrinho
+- `feat/llm-client-port`: porta `LlmClient`, `FakeLlmClient` e adaptador Bedrock (FEITO)
+- `feat/agent-orchestrator`: loop do agente com limite de iterações (FEITO)
+- `feat/agent-search-tools`: tools `search_dishes` e `get_dish` (FEITO)
+- `feat/cart-api`: módulo `ordering` e carrinho (FEITO)
 - `feat/agent-cart-tools`: tools `add_to_cart` e `view_cart`
 - `feat/chat-streaming-api`: endpoint SSE
 - `feat/llm-call-metrics`: persistência de tokens, latência e custo
