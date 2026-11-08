@@ -106,8 +106,8 @@ Esta lista é um plano e pode mudar ao longo do projeto.
 - `feat/agent-orchestrator`: loop do agente com limite de iterações (FEITO)
 - `feat/agent-search-tools`: tools `search_dishes` e `get_dish` (FEITO)
 - `feat/cart-api`: módulo `ordering` e carrinho (FEITO)
-- `feat/agent-cart-tools`: tools `add_to_cart` e `view_cart`
-- `feat/chat-streaming-api`: endpoint SSE
+- `feat/agent-cart-tools`: tools `add_to_cart` e `view_cart` (FEITO)
+- `feat/chat-streaming-api`: endpoint SSE (FEITO)
 - `feat/llm-call-metrics`: persistência de tokens, latência e custo
 - `chore/frontend-bootstrap`: Vite + React + TypeScript
 - `feat/chat-ui`: tela de chat com streaming
