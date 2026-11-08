@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.caiolira18.foodassistant.shared.SessionIds;
+
 @Service
 public class CartService {
 
@@ -80,7 +82,8 @@ public class CartService {
 
     private void checkDistinctLimit(UUID cartId, int currentQuantity) {
         if (currentQuantity == 0 && repository.distinctItems(cartId) >= MAX_DISTINCT_ITEMS) {
-            throw new IllegalArgumentException("O carrinho aceita no máximo " + MAX_DISTINCT_ITEMS + " itens diferentes");
+            throw new IllegalArgumentException(
+                    "O carrinho aceita no máximo " + MAX_DISTINCT_ITEMS + " itens diferentes");
         }
     }
 
@@ -92,10 +95,7 @@ public class CartService {
     }
 
     private static String validSession(String sessionId) {
-        if (sessionId == null || !SESSION_ID.matcher(sessionId).matches()) {
-            throw new IllegalArgumentException("Sessão inválida");
-        }
-        return sessionId;
+        return SessionIds.validate(sessionId);
     }
 
     private static long validDish(Long dishId) {
