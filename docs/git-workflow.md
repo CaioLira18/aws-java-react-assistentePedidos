@@ -108,7 +108,7 @@ Esta lista é um plano e pode mudar ao longo do projeto.
 - `feat/cart-api`: módulo `ordering` e carrinho (FEITO)
 - `feat/agent-cart-tools`: tools `add_to_cart` e `view_cart` (FEITO)
 - `feat/chat-streaming-api`: endpoint SSE (FEITO)
-- `feat/llm-call-metrics`: persistência de tokens, latência e custo
+- `feat/llm-call-metrics`: persistência de tokens, latência e custo (FEITO)
 - `chore/frontend-bootstrap`: Vite + React + TypeScript
 - `feat/chat-ui`: tela de chat com streaming
 - `feat/dish-cards-and-cart-ui`: cards de pratos e carrinho
