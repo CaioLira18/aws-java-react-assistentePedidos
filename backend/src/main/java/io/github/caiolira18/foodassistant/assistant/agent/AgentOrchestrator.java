@@ -13,6 +13,7 @@ import io.github.caiolira18.foodassistant.assistant.llm.LlmResponse;
 import io.github.caiolira18.foodassistant.assistant.llm.Message;
 import io.github.caiolira18.foodassistant.assistant.llm.ToolCall;
 import io.github.caiolira18.foodassistant.assistant.llm.Usage;
+import io.github.caiolira18.foodassistant.assistant.metrics.LlmCallRecorder;
 
 public class AgentOrchestrator {
 
@@ -24,16 +25,23 @@ public class AgentOrchestrator {
     private final ToolRegistry tools;
     private final AgentSettings settings;
     private final Clock clock;
+    private final LlmCallRecorder recorder;
 
     public AgentOrchestrator(LlmClient llm, ToolRegistry tools, AgentSettings settings) {
-        this(llm, tools, settings, Clock.systemUTC());
+        this(llm, tools, settings, Clock.systemUTC(), LlmCallRecorder.NOOP);
     }
 
     public AgentOrchestrator(LlmClient llm, ToolRegistry tools, AgentSettings settings, Clock clock) {
+        this(llm, tools, settings, clock, LlmCallRecorder.NOOP);
+    }
+
+    public AgentOrchestrator(LlmClient llm, ToolRegistry tools, AgentSettings settings, Clock clock,
+            LlmCallRecorder recorder) {
         this.llm = llm;
         this.tools = tools;
         this.settings = settings;
         this.clock = clock;
+        this.recorder = recorder == null ? LlmCallRecorder.NOOP : recorder;
     }
 
     /** onToken nulo usa generate; informado, usa stream e repassa o texto conforme chega. */
@@ -66,7 +74,9 @@ public class AgentOrchestrator {
 
             LlmRequest request = new LlmRequest(AgentPrompt.SYSTEM, conversation, tools.definitions(),
                     settings.maxTokens());
+            Instant callStart = clock.instant();
             LlmResponse response = onToken == null ? llm.generate(request) : llm.stream(request, onToken);
+            recorder.record(sessionId, response.usage(), Duration.between(callStart, clock.instant()));
 
             Usage usage = response.usage();
             if (usage != null) {
