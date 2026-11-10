@@ -1,0 +1,60 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 8rem);
+  min-height: 20rem;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.chat-hint {
+  opacity: 0.7;
+}
+
+.bubble {
+  max-width: 85%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: rgba(37, 99, 235, 0.85);
+  color: #fff;
+}
+
+.bubble.assistant {
+  align-self: flex-start;
+  background: rgba(127, 127, 127, 0.18);
+}
+
+.bubble.failed {
+  background: rgba(220, 38, 38, 0.18);
+}
+
+.chat-form {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.chat-form input {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  font: inherit;
+}
+
+.chat-form button {
+  padding: 0.6rem 1rem;
+  font: inherit;
+  cursor: pointer;
+}
