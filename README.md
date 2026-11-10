@@ -80,6 +80,14 @@ cp .env.example .env        # defina DB_PASSWORD
 docker compose up -d db     # PostgreSQL com pgvector
 ```
 
+Frontend (com o backend rodando na porta 8080):
+
+```bash
+cd frontend
+npm install
+npm run dev   # http://localhost:5173
+```
+
 Instruções do backend e do frontend serão adicionadas conforme cada parte for construída. Para chamar o Bedrock é preciso uma conta AWS com acesso aos modelos habilitado.
 
 ## Decisões de arquitetura
