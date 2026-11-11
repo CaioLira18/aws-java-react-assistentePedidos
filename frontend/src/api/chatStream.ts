@@ -1,14 +1,16 @@
+import type { Dish } from '../types'
+import { parseDishes } from './dishes'
+import { GENERIC_ERROR, readErrorMessage } from './http'
 import { createSseParser } from './sse'
 
 export type DoneInfo = { outcome: string; iterations: number }
 
 export type ChatHandlers = {
   onToken: (text: string) => void
+  onDishes: (dishes: Dish[]) => void
   onDone: (info: DoneInfo) => void
   onError: (message: string) => void
 }
-
-const GENERIC_ERROR = 'Não foi possível falar com o assistente. Tente novamente.'
 
 function isAbort(err: unknown): boolean {
   return err instanceof DOMException && err.name === 'AbortError'
@@ -21,18 +23,6 @@ function safeJson(raw: string): Record<string, unknown> | null {
   } catch {
     return null
   }
-}
-
-async function readError(res: Response): Promise<string> {
-  try {
-    const body: unknown = await res.json()
-    if (typeof body === 'object' && body !== null && 'error' in body && typeof body.error === 'string') {
-      return body.error
-    }
-  } catch {
-    // o corpo não era JSON
-  }
-  return GENERIC_ERROR
 }
 
 export async function streamChat(
@@ -59,7 +49,7 @@ export async function streamChat(
   }
 
   if (!res.ok || !res.body) {
-    handlers.onError(await readError(res))
+    handlers.onError(await readErrorMessage(res))
     return
   }
 
@@ -67,6 +57,8 @@ export async function streamChat(
     const data = safeJson(event.data)
     if (event.event === 'token' && typeof data?.text === 'string') {
       handlers.onToken(data.text)
+    } else if (event.event === 'dishes') {
+      handlers.onDishes(parseDishes(data))
     } else if (event.event === 'done') {
       handlers.onDone({ outcome: String(data?.outcome ?? ''), iterations: Number(data?.iterations ?? 0) })
     } else if (event.event === 'error') {

@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { streamChat } from '../api/chatStream'
+import { mergeDishes } from '../api/dishes'
 import { getSessionId } from '../session'
+import type { Dish } from '../types'
+import DishCard from './DishCard'
 import './Chat.css'
 
 const MAX_LENGTH = 500
@@ -9,10 +12,17 @@ type ChatMessage = {
   id: number
   role: 'user' | 'assistant'
   text: string
+  dishes: Dish[]
   failed?: boolean
 }
 
-export default function Chat() {
+type Props = {
+  onAddDish: (dishId: number) => void
+  cartBusy: boolean
+  onTurnFinished: () => void
+}
+
+export default function Chat({ onAddDish, cartBusy, onTurnFinished }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [streaming, setStreaming] = useState(false)
@@ -39,8 +49,8 @@ export default function Chat() {
     const assistantId = nextId.current + 1
     setMessages((prev) => [
       ...prev,
-      { id: nextId.current, role: 'user', text },
-      { id: assistantId, role: 'assistant', text: '' },
+      { id: nextId.current, role: 'user', text, dishes: [] },
+      { id: assistantId, role: 'assistant', text: '', dishes: [] },
     ])
     nextId.current += 2
     setInput('')
@@ -57,6 +67,7 @@ export default function Chat() {
       getSessionId(),
       {
         onToken: (token) => update((m) => ({ ...m, text: m.text + token })),
+        onDishes: (found) => update((m) => ({ ...m, dishes: mergeDishes(m.dishes, found) })),
         onDone: () => undefined,
         onError: (message) => update((m) => ({ ...m, text: message, failed: true })),
       },
@@ -68,6 +79,7 @@ export default function Chat() {
     }
     abortRef.current = null
     setStreaming(false)
+    onTurnFinished()
   }
 
   return (
@@ -78,11 +90,22 @@ export default function Chat() {
             Peça uma sugestão, por exemplo: almoço vegetariano, sem glúten, até R$ 40, pronto em 30 minutos.
           </p>
         )}
-        {messages.map((m) => (
-          <div key={m.id} className={`bubble ${m.role}${m.failed ? ' failed' : ''}`}>
-            {m.text || (streaming ? 'Pensando…' : '')}
-          </div>
-        ))}
+        {messages.map((m) => {
+          const pending = streaming && m.role === 'assistant' && m.dishes.length === 0
+          const label = m.text || (pending ? 'Pensando…' : '')
+          return (
+            <div key={m.id} className="message">
+              {label && <div className={`bubble ${m.role}${m.failed ? ' failed' : ''}`}>{label}</div>}
+              {m.dishes.length > 0 && (
+                <div className="dish-list">
+                  {m.dishes.map((dish) => (
+                    <DishCard key={dish.id} dish={dish} onAdd={onAddDish} disabled={cartBusy} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
         <div ref={endRef} />
       </div>
 

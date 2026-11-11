@@ -1,0 +1,68 @@
+.dish-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.5rem;
+}
+
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 0.75rem;
+}
+
+.dish-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dish-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tags {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.tags li {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(22, 163, 74, 0.2);
+}
+
+.dish-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: auto;
+}
+
+.price {
+  font-weight: 600;
+}
+
+.prep {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.dish-footer button {
+  margin-left: auto;
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  cursor: pointer;
+}
