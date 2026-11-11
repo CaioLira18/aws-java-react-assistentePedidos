@@ -4,6 +4,7 @@ import static io.github.caiolira18.foodassistant.assistant.agent.ToolRegistryTes
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -38,7 +39,7 @@ class AgentOrchestratorTest {
         var llm = new FakeLlmClient().enqueue(FakeLlmClient.text("Olá! Como posso ajudar?"));
         var orchestrator = new AgentOrchestrator(llm, registryWith(searchTool()), AgentSettings.defaults());
 
-        AgentResult result = orchestrator.run("s1", List.of(), "oi", null);
+        AgentResult result = orchestrator.run("s1", List.of(), "oi", null, ToolEvents.NONE);
 
         assertEquals(AgentOutcome.COMPLETED, result.outcome());
         assertEquals("Olá! Como posso ajudar?", result.reply());
@@ -62,7 +63,7 @@ class AgentOrchestratorTest {
         }));
         var orchestrator = new AgentOrchestrator(llm, registry, AgentSettings.defaults());
 
-        AgentResult result = orchestrator.run("s1", List.of(), "quero algo vegano", null);
+        AgentResult result = orchestrator.run("s1", List.of(), "quero algo vegano", null, ToolEvents.NONE);
 
         assertEquals(List.of("{\"query\":\"vegano\"}|s1"), seen);
         assertEquals(AgentOutcome.COMPLETED, result.outcome());
@@ -87,7 +88,7 @@ class AgentOrchestratorTest {
         }));
         var orchestrator = new AgentOrchestrator(llm, registry, AgentSettings.defaults());
 
-        AgentResult result = orchestrator.run("s1", List.of(), "quero comer", null);
+        AgentResult result = orchestrator.run("s1", List.of(), "quero comer", null, ToolEvents.NONE);
 
         assertEquals(AgentOutcome.COMPLETED, result.outcome());
         Message toolMessage = llm.received().get(1).messages().get(2);
@@ -101,7 +102,7 @@ class AgentOrchestratorTest {
                 .enqueue(FakeLlmClient.text("Não consegui fazer isso."));
         var orchestrator = new AgentOrchestrator(llm, registryWith(searchTool()), AgentSettings.defaults());
 
-        AgentResult result = orchestrator.run("s1", List.of(), "apague tudo", null);
+        AgentResult result = orchestrator.run("s1", List.of(), "apague tudo", null, ToolEvents.NONE);
 
         assertEquals(AgentOutcome.COMPLETED, result.outcome());
         assertTrue(llm.received().get(1).messages().get(2).text().contains("desconhecida"));
@@ -117,7 +118,7 @@ class AgentOrchestratorTest {
         var orchestrator = new AgentOrchestrator(llm, registryWith(searchTool()), settings);
         List<String> tokens = new ArrayList<>();
 
-        AgentResult result = orchestrator.run("s1", List.of(), "busque", tokens::add);
+        AgentResult result = orchestrator.run("s1", List.of(), "busque", tokens::add, ToolEvents.NONE);
 
         assertEquals(AgentOutcome.ITERATION_LIMIT, result.outcome());
         assertEquals(3, llm.received().size());
@@ -141,7 +142,7 @@ class AgentOrchestratorTest {
         var settings = new AgentSettings(5, Duration.ofSeconds(30), 512, 20, 4);
         var orchestrator = new AgentOrchestrator(llm, registryWith(searchTool()), settings, clock);
 
-        AgentResult result = orchestrator.run("s1", List.of(), "busque", null);
+        AgentResult result = orchestrator.run("s1", List.of(), "busque", null, ToolEvents.NONE);
 
         assertEquals(AgentOutcome.TIMEOUT, result.outcome());
         assertEquals(1, llm.received().size());
@@ -154,7 +155,7 @@ class AgentOrchestratorTest {
         var orchestrator = new AgentOrchestrator(llm, registryWith(searchTool()), AgentSettings.defaults());
         List<String> tokens = new ArrayList<>();
 
-        orchestrator.run("s1", List.of(), "oi", tokens::add);
+        orchestrator.run("s1", List.of(), "oi", tokens::add, ToolEvents.NONE);
 
         assertEquals(List.of("Olá!"), tokens);
     }
@@ -172,7 +173,7 @@ class AgentOrchestratorTest {
         var llmSmall = new FakeLlmClient().enqueue(FakeLlmClient.text("ok"));
         new AgentOrchestrator(llmSmall, registryWith(searchTool()),
                 new AgentSettings(5, Duration.ofSeconds(30), 512, 3, 4))
-                .run("s1", history, "novo", null);
+                .run("s1", history, "novo", null, ToolEvents.NONE);
         List<Message> sentSmall = llmSmall.received().get(0).messages();
         assertEquals(1, sentSmall.size());
         assertEquals("novo", sentSmall.get(0).text());
@@ -180,7 +181,7 @@ class AgentOrchestratorTest {
         var llmBig = new FakeLlmClient().enqueue(FakeLlmClient.text("ok"));
         new AgentOrchestrator(llmBig, registryWith(searchTool()),
                 new AgentSettings(5, Duration.ofSeconds(30), 512, 4, 4))
-                .run("s1", history, "novo", null);
+                .run("s1", history, "novo", null, ToolEvents.NONE);
         List<Message> sentBig = llmBig.received().get(0).messages();
         assertEquals(5, sentBig.size());
         assertEquals("u2", sentBig.get(0).text());
@@ -201,7 +202,7 @@ class AgentOrchestratorTest {
         }));
         var settings = new AgentSettings(5, Duration.ofSeconds(30), 512, 20, 2);
 
-        new AgentOrchestrator(llm, registry, settings).run("s1", List.of(), "busque", null);
+        new AgentOrchestrator(llm, registry, settings).run("s1", List.of(), "busque", null, ToolEvents.NONE);
 
         assertEquals(2, executed.get());
         List<Message> second = llm.received().get(1).messages();
@@ -216,7 +217,7 @@ class AgentOrchestratorTest {
         var llm = new FakeLlmClient().enqueue(cut);
         var orchestrator = new AgentOrchestrator(llm, registryWith(searchTool()), AgentSettings.defaults());
 
-        AgentResult result = orchestrator.run("s1", List.of(), "conte uma história", null);
+        AgentResult result = orchestrator.run("s1", List.of(), "conte uma história", null, ToolEvents.NONE);
 
         assertEquals(AgentOutcome.MAX_TOKENS, result.outcome());
         assertEquals("Texto cortado", result.reply());
@@ -224,10 +225,11 @@ class AgentOrchestratorTest {
 
     @Test
     void rejectsBlankSessionAndBlankMessage() {
-        var orchestrator = new AgentOrchestrator(new FakeLlmClient(), registryWith(searchTool()), AgentSettings.defaults());
+        var orchestrator = new AgentOrchestrator(new FakeLlmClient(), registryWith(searchTool()),
+                AgentSettings.defaults());
 
-        assertThrows(IllegalArgumentException.class, () -> orchestrator.run(" ", List.of(), "oi", null));
-        assertThrows(IllegalArgumentException.class, () -> orchestrator.run("s1", List.of(), "  ", null));
+        assertThrows(IllegalArgumentException.class, () -> orchestrator.run(" ", List.of(), "oi", null, ToolEvents.NONE));
+        assertThrows(IllegalArgumentException.class, () -> orchestrator.run("s1", List.of(), "  ", null, ToolEvents.NONE));
     }
 
     private static class MutableClock extends Clock {
@@ -252,5 +254,22 @@ class AgentOrchestratorTest {
         public Instant instant() {
             return now;
         }
+    }
+
+    @Test
+    void toolsCanPublishEventsGivenToTheRun() {
+        var llm = new FakeLlmClient()
+                .enqueue(FakeLlmClient.toolCall("t1", "search_dishes", "{}"))
+                .enqueue(FakeLlmClient.text("ok"));
+        var registry = registryWith(tool("search_dishes", (args, ctx) -> {
+            ctx.events().dishesFound(List.of(new DishSummary(1, "X", "d", 1000, 10, List.of())));
+            return "[]";
+        }));
+        List<DishSummary> published = new ArrayList<>();
+
+        new AgentOrchestrator(llm, registry, AgentSettings.defaults())
+                .run("s1", List.of(), "busque", null, published::addAll);
+
+        assertEquals(1, published.size());
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import io.github.caiolira18.foodassistant.assistant.agent.AgentOrchestrator;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentResult;
+import io.github.caiolira18.foodassistant.assistant.agent.ToolEvents;
 import io.github.caiolira18.foodassistant.assistant.llm.Message;
 import io.github.caiolira18.foodassistant.shared.SessionIds;
 
@@ -61,9 +62,9 @@ public class ChatService {
         activeSessions.remove(turn.sessionId());
     }
 
-    public AgentResult run(Turn turn, Consumer<String> onToken) {
+    public AgentResult run(Turn turn, Consumer<String> onToken, ToolEvents events) {
         List<Message> past = history.recent(turn.sessionId(), HISTORY_MESSAGES);
-        AgentResult result = orchestrator.run(turn.sessionId(), past, turn.message(), onToken);
+        AgentResult result = orchestrator.run(turn.sessionId(), past, turn.message(), onToken, events);
         String reply = result.reply().isBlank() ? EMPTY_REPLY : result.reply();
         history.appendTurn(turn.sessionId(), turn.message(), reply);
         return result;

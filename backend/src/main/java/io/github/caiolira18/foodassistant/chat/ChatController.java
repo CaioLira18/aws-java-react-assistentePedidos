@@ -1,6 +1,7 @@
 package io.github.caiolira18.foodassistant.chat;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import io.github.caiolira18.foodassistant.assistant.agent.AgentResult;
+import io.github.caiolira18.foodassistant.assistant.agent.DishSummary;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -37,6 +39,9 @@ class ChatController {
     }
 
     record ErrorEvent(String message) {
+    }
+
+    record DishesEvent(List<DishSummary> dishes) {
     }
 
     private static class ClientGoneException extends RuntimeException {
@@ -75,7 +80,10 @@ class ChatController {
 
     private void stream(ChatService.Turn turn, SseEmitter emitter) {
         try {
-            AgentResult result = chat.run(turn, token -> send(emitter, "token", new TokenEvent(token)));
+            AgentResult result = chat.run(
+                    turn,
+                    token -> send(emitter, "token", new TokenEvent(token)),
+                    dishes -> sendQuietly(emitter, "dishes", new DishesEvent(dishes)));
             send(emitter, "done", new DoneEvent(result.outcome().name(), result.iterations()));
             emitter.complete();
         } catch (ClientGoneException e) {
@@ -98,6 +106,14 @@ class ChatController {
             emitter.send(SseEmitter.event().name(name).data(data, MediaType.APPLICATION_JSON));
         } catch (IOException | IllegalStateException e) {
             throw new ClientGoneException(e);
+        }
+    }
+
+    private static void sendQuietly(SseEmitter emitter, String name, Object data) {
+        try {
+            send(emitter, name, data);
+        } catch (ClientGoneException e) {
+            log.debug("Cliente desconectou antes do evento {}", name);
         }
     }
 
