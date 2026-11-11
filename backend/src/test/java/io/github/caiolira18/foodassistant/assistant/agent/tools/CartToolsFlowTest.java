@@ -33,7 +33,7 @@ class CartToolsFlowTest {
                 .enqueue(FakeLlmClient.text("Adicionei 2 Feijoadas Veganas. Total: R$ 63,80."));
         var orchestrator = new AgentOrchestrator(llm, registry, AgentSettings.defaults());
 
-        AgentResult result = orchestrator.run("sessao-12345678", List.of(), "adicione 2 feijoadas veganas", null);
+        AgentResult result = orchestrator.run("sessao-12345678", List.of(), "adicione 2 feijoadas veganas", null, null);
 
         assertEquals(AgentOutcome.COMPLETED, result.outcome());
         verify(cart).addItem("sessao-12345678", 7L, 2);

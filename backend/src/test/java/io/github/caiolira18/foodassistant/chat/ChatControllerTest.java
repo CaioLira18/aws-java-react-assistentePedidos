@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentOrchestrator;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentOutcome;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentResult;
+import io.github.caiolira18.foodassistant.assistant.agent.DishSummary;
+import io.github.caiolira18.foodassistant.assistant.agent.ToolEvents;
 import io.github.caiolira18.foodassistant.assistant.llm.Usage;
 
 class ChatControllerTest {
@@ -49,7 +51,7 @@ class ChatControllerTest {
 
     @Test
     void streamsTokensAndFinishesWithADoneEvent() throws Exception {
-        when(orchestrator.run(any(), any(), any(), any())).thenAnswer(invocation -> {
+        when(orchestrator.run(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
             Consumer<String> onToken = invocation.getArgument(3);
             onToken.accept("Ola");
             onToken.accept(" mundo");
@@ -68,7 +70,7 @@ class ChatControllerTest {
 
     @Test
     void agentFailureBecomesAGenericErrorEventAndFreesTheSession() throws Exception {
-        when(orchestrator.run(any(), any(), any(), any())).thenThrow(new RuntimeException("segredo interno"));
+        when(orchestrator.run(any(), any(), any(), any(), any())).thenThrow(new RuntimeException("segredo interno"));
 
         String body = streamBody("{\"message\":\"oi\"}");
 
@@ -101,5 +103,21 @@ class ChatControllerTest {
                 .contentType(MediaType.APPLICATION_JSON).content("{\"message\":\"oi\"}"))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    void emitsTheDishesFoundByTheAgent() throws Exception {
+        when(orchestrator.run(any(), any(), any(), any(), any())).thenAnswer(invocation -> {
+            ToolEvents events = invocation.getArgument(4);
+            events.dishesFound(
+                    List.of(new DishSummary(7, "Feijoada Vegana", "Feijão preto.", 3190, 45, List.of("vegano"))));
+            return new AgentResult("Achei!", AgentOutcome.COMPLETED, 1, new Usage(1, 1), Duration.ZERO, List.of());
+        });
+
+        String body = streamBody("{\"message\":\"oi\"}");
+
+        assertTrue(body.contains("event:dishes"));
+        assertTrue(body.contains("\"priceCents\":3190"));
+        assertTrue(body.contains("Feijoada Vegana"));
     }
 }

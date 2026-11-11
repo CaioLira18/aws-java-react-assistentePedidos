@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentOrchestrator;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentOutcome;
 import io.github.caiolira18.foodassistant.assistant.agent.AgentResult;
+import io.github.caiolira18.foodassistant.assistant.agent.ToolEvents;
 import io.github.caiolira18.foodassistant.assistant.llm.Message;
 import io.github.caiolira18.foodassistant.assistant.llm.Usage;
 
@@ -74,10 +75,10 @@ class ChatServiceTest {
     void runLoadsHistoryCallsTheAgentAndPersistsTheTurn() {
         List<Message> past = List.of(Message.user("antes"), Message.assistant("resposta", List.of()));
         when(history.recent(SESSION, ChatService.HISTORY_MESSAGES)).thenReturn(past);
-        when(orchestrator.run(eq(SESSION), eq(past), eq("oi"), any())).thenReturn(result("Olá!"));
+        when(orchestrator.run(eq(SESSION), eq(past), eq("oi"), any(), any())).thenReturn(result("Olá!"));
         ChatService.Turn turn = service.reserve(SESSION, "  oi  ");
 
-        AgentResult result = service.run(turn, token -> { });
+        AgentResult result = service.run(turn, token -> { }, ToolEvents.NONE);
 
         assertEquals("Olá!", result.reply());
         verify(history).appendTurn(SESSION, "oi", "Olá!");

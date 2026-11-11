@@ -39,6 +39,6 @@ class FoodassistantApplicationTests {
         Set<String> names = toolRegistry.definitions().stream()
                 .map(ToolDefinition::name).collect(Collectors.toSet());
 
-        assertEquals(Set.of("add_to_cart", "view_cart"), names);
+        assertEquals(Set.of("add_to_cart", "search_dishes", "view_cart"), names);
     }
 }
