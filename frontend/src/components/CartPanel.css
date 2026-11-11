@@ -1,0 +1,55 @@
+.cart {
+  align-self: start;
+  padding: 0.8rem;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 0.75rem;
+}
+
+.cart h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.cart-empty {
+  opacity: 0.7;
+}
+
+.cart-error {
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  background: rgba(220, 38, 38, 0.18);
+}
+
+.cart-lines {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.line-name {
+  font-weight: 500;
+}
+
+.line-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.line-total {
+  margin-left: auto;
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.8rem 0 0.5rem;
+}
+
+.cart button {
+  cursor: pointer;
+  font: inherit;
+}
