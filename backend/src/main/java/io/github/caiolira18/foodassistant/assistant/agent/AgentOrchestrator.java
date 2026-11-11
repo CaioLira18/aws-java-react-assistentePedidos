@@ -45,7 +45,7 @@ public class AgentOrchestrator {
     }
 
     /** onToken nulo usa generate; informado, usa stream e repassa o texto conforme chega. */
-    public AgentResult run(String sessionId, List<Message> history, String userText, Consumer<String> onToken) {
+    public AgentResult run(String sessionId, List<Message> history, String userText, Consumer<String> onToken, ToolEvents events) {
         if (sessionId == null || sessionId.isBlank()) {
             throw new IllegalArgumentException("sessionId é obrigatório");
         }
@@ -53,7 +53,7 @@ public class AgentOrchestrator {
             throw new IllegalArgumentException("A mensagem não pode ser vazia");
         }
 
-        ToolContext context = new ToolContext(sessionId);
+        ToolContext context = new ToolContext(sessionId, events);
         Instant start = clock.instant();
         Instant deadline = start.plus(settings.timeout());
 
